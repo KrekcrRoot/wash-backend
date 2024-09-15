@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ILike, Repository } from "typeorm";
 import { MachineEntity } from "./dto/machine.entity";
 import { UserEntity } from "../user/dto/user.entity";
+import { UserTypeEnum } from "../user/dto/user.type.enum";
 
 @Injectable()
 export class MachineService {
@@ -35,6 +36,21 @@ export class MachineService {
   {
     user.link_machine = null;
     return await this.userRepository.save(user);
+  }
+
+  async getAdmin(machine: MachineEntity)
+  {
+    return this.userRepository.findOne({
+      where: {
+        link_machine: {
+          uuid: machine.uuid
+        },
+        type: UserTypeEnum.Admin,
+      },
+      relations: {
+        link_machine: true,
+      },
+    });
   }
 
 }

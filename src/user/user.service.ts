@@ -1,9 +1,10 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ILike, Repository } from "typeorm";
 import { UserEntity } from "./dto/user.entity";
 import { UserTelegramIdDto } from "./dto/user.telegram.id.dto";
 import { PrecreateUserDto } from "./dto/precreate.user.dto";
 import { RoomEntity } from "../room/dto/room.entity";
+import { AuthUserDto } from "./dto/auth.user.dto";
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,9 @@ export class UserService {
     return this.users_repository.findOne({
       where: {
         telegram_id: telegramDto.telegramId,
+      },
+      relations: {
+        link_machine: true,
       },
     });
   }
@@ -60,6 +64,18 @@ export class UserService {
     await this.room_repository.save(room);
 
     return await this.users_repository.save(user);
+  }
+
+  async auth(userAuthDto: AuthUserDto)
+  {
+    const user = await this.users_repository.findOne({
+      where: { ...userAuthDto },
+    });
+
+    if(!user)
+      throw new BadRequestException('There are no user with this tag and id');
+
+    return HttpStatus.OK;
   }
 
 }
