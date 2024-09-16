@@ -9,5 +9,6 @@ import { UserModule } from "../user/user.module";
   imports: [DatabaseModule, UserModule],
   controllers: [ReportController],
   providers: [ReportService, ...reportProviders],
+  exports: [ReportService],
 })
 export class ReportModule {}

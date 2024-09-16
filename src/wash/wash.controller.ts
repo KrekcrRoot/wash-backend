@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { WashService } from "./wash.service";
 import { UserService } from "../user/user.service";
 import { AuthGuard } from "../user/auth.guard";
 import { getUser, TokenRequest } from "../user/dto/user.validate";
+import { ReportService } from "../report/report.service";
+import { ReportEnum } from "../report/report.enum";
 
 @Controller('wash')
 export class WashController {
@@ -10,6 +12,7 @@ export class WashController {
   constructor(
     private readonly washService: WashService,
     private readonly userService: UserService,
+    private readonly reportService: ReportService,
   ) {}
 
   @Get('/all')
@@ -42,8 +45,13 @@ export class WashController {
 
   @UseGuards(AuthGuard)
   @Post('/broke')
-  broke()
+  async broke(@Req() tokenRequest: TokenRequest)
   {
+    const user = await getUser(tokenRequest, this.userService);
+    await this.reportService.make({
+      type: ReportEnum.Broke,
+      body: "Machine was broke",
+    }, user);
     return this.washService.broke();
   }
 
@@ -52,6 +60,10 @@ export class WashController {
   async fix(@Req() tokenRequest: TokenRequest)
   {
     const user = await getUser(tokenRequest, this.userService);
+    await this.reportService.make({
+      type: ReportEnum.Fix,
+      body: "Machine fixed",
+    }, user);
 
     return this.washService.fix()
   }

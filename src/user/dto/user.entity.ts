@@ -9,7 +9,7 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   uuid: string;
 
-  @Column()
+  @Column({ nullable: true })
   telegram_id: string;
 
   @Column()
@@ -33,4 +33,6 @@ export class UserEntity {
   @Column({ default: 100 })
   trust_factor: number;
 
+  @Column({ default: false })
+  kicked: boolean;
 }
