@@ -1,9 +1,10 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 
 export class MachineSearchDto
 {
   @IsNotEmpty()
+  @IsUUID()
   @IsString()
-  title: string;
+  uuid: string;
 }

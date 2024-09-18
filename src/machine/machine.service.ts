@@ -26,6 +26,15 @@ export class MachineService {
     });
   }
 
+  async getByUuid(uuid: string)
+  {
+    return this.machineRepository.findOne({
+      where: {
+        uuid: uuid,
+      },
+    });
+  }
+
   async linkMachine(machine: MachineEntity, user: UserEntity)
   {
     user.link_machine = machine;

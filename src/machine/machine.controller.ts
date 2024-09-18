@@ -28,7 +28,7 @@ export class MachineController {
   async linkMachine(@Req() request: TokenRequest, @Body() data: MachineSearchDto)
   {
     const user = await getUser(request, this.userService);
-    const machine = await this.machineService.findMachine(data.title);
+    const machine = await this.machineService.getByUuid(data.uuid);
 
     if(!machine)
       throw new BadRequestException('There are no machine with this title');
