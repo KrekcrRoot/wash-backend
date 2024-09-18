@@ -1,10 +1,13 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, HttpStatus, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { MachineService } from "./machine.service";
 import { AuthGuard } from "../user/auth.guard";
 import { UserService } from "../user/user.service";
 import { getUser, TokenRequest } from "../user/dto/user.validate";
 import { MachineSearchDto } from "./dto/machine.search.dto";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { UserEntity } from "../user/dto/user.entity";
 
+@ApiTags('Machine controller')
 @Controller('machine')
 export class MachineController {
 
@@ -13,6 +16,13 @@ export class MachineController {
     private userService: UserService,
   ) {}
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: UserEntity,
+    isArray: false,
+    description: 'linking machine',
+  })
+  @ApiOperation({ summary: 'linking machine' })
   @UseGuards(AuthGuard)
   @Post('/link')
   async linkMachine(@Req() request: TokenRequest, @Body() data: MachineSearchDto)
