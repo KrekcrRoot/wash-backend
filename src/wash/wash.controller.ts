@@ -5,8 +5,10 @@ import { AuthGuard } from "../user/auth.guard";
 import { getUser, TokenRequest } from "../user/dto/user.validate";
 import { ReportService } from "../report/report.service";
 import { ReportEnum } from "../report/report.enum";
+import { ApiTags } from "@nestjs/swagger";
 
-@Controller('Wash controller')
+@ApiTags('Wash controller')
+@Controller('wash')
 export class WashController {
 
   constructor(
