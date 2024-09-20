@@ -39,9 +39,8 @@ export class WashService {
     });
   }
 
-  async getStatus()
+  async getStatus(machine: MachineEntity)
   {
-    const machine = (await this.machineRepository.find())[0];
 
     let status: WashStatusDto = {
       isActive: machine.isActive,
@@ -59,12 +58,37 @@ export class WashService {
       wash.hard_end = true;
       wash.time_end = now;
       await this.washRepository.save(wash);
+
+      const queue = wash.queued;
+      if(queue)
+      {
+        machine.isActive = true;
+        await this.machineRepository.save(machine);
+
+        queue.count += 1;
+        await this.userRepository.save(queue);
+
+        const wash: WashEntity = this.washRepository.create({
+          machine: machine,
+          user: queue,
+          time_begin: now,
+        });
+
+        await this.washRepository.save(wash);
+        status.isActive = true;
+        status.timeBegin = now;
+        status.telegramTag = queue.telegram_tag;
+        return status;
+      }
+
       machine.isActive = false;
       await this.machineRepository.save(machine);
+
       status.isActive = false;
       wash.user.time += 3 * 60;
       wash.user.trust_factor -= 5;
       await this.userRepository.save(wash.user);
+
       return status;
     }
 
@@ -76,14 +100,14 @@ export class WashService {
 
   async occupy(user: UserEntity)
   {
-    const status = await this.getStatus();
+    const status = await this.getStatus(user.link_machine);
 
     if(status.isActive)
     {
       throw new BadRequestException('already occupy');
     }
 
-    const machine = (await this.machineRepository.find())[0];
+    const machine = user.link_machine;
     machine.isActive = true;
     await this.machineRepository.save(machine);
 
@@ -95,9 +119,34 @@ export class WashService {
 
   }
 
+  async occupyOrder(user: UserEntity)
+  {
+    const machine = user.link_machine;
+    if(!machine.isActive)
+      throw new BadRequestException('Machine isn\'t occupied');
+
+    const wash = await this.washRepository.findOne({
+      where: {
+        machine: {
+          uuid: machine.uuid
+        },
+        time_end: null,
+      },
+    });
+
+    if(wash.user == user)
+      throw new BadRequestException('You can\'t occupy again machine');
+
+    if(wash.queued)
+      throw new BadRequestException('Machine already occupied');
+
+    wash.queued = user;
+    return this.washRepository.save(wash);
+  }
+
   async end(user: UserEntity)
   {
-    const status = await this.getStatus();
+    const status = await this.getStatus(user.link_machine);
 
     if(!status.isActive)
       throw new BadRequestException('already ended');
@@ -133,16 +182,14 @@ export class WashService {
     } as WashTotalDto;
   }
 
-  async broke()
+  async broke(machine: MachineEntity)
   {
-    const machine = (await this.machineRepository.find())[0];
     machine.broken = true;
     return this.machineRepository.save(machine);
   }
 
-  async fix()
+  async fix(machine: MachineEntity)
   {
-    const machine = (await this.machineRepository.find())[0];
     machine.broken = false;
     return this.machineRepository.save(machine);
   }

@@ -1,4 +1,15 @@
-import { BadRequestException, Body, Controller, Get, HttpStatus, Param, Post, Req, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+  UseGuards
+} from "@nestjs/common";
 import { MachineService } from "./machine.service";
 import { AuthGuard } from "../user/auth.guard";
 import { UserService } from "../user/user.service";
@@ -7,6 +18,7 @@ import { MachineSearchDto } from "./dto/machine.search.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UserEntity } from "../user/dto/user.entity";
 import { RelationService } from "../relation/relation.service";
+import { WashService } from "../wash/wash.service";
 
 @ApiTags('Machine controller')
 @Controller('machine')
@@ -16,6 +28,7 @@ export class MachineController {
     private machineService: MachineService,
     private userService: UserService,
     private relationService: RelationService,
+    private washService: WashService,
   ) {}
 
   @ApiResponse({
@@ -32,6 +45,14 @@ export class MachineController {
     const user = await getUser(request, this.userService);
     const machine = await this.machineService.getByUuid(data.uuid);
 
+    if(user.link_machine)
+    {
+      const status = await this.washService.getStatus(user.link_machine);
+      if(status.isActive && status.telegramTag == user.telegram_tag)
+        throw new ForbiddenException('You can\'t relink to another machine while washing');
+    }
+
+
     if(!machine)
       throw new BadRequestException('There are no machine with this title');
 
@@ -43,6 +64,14 @@ export class MachineController {
   async unlinkMachine(@Req() request: TokenRequest)
   {
     const user = await getUser(request, this.userService);
+
+    if(!user.link_machine)
+      throw new BadRequestException('You already not linked to any machines');
+
+    const status = await this.washService.getStatus(user.link_machine);
+    if(status.isActive && status.telegramTag == user.telegram_tag)
+      throw new ForbiddenException('You can\'t unlink from machine while washing');
+
     return this.machineService.unlinkMachine(user);
   }
 

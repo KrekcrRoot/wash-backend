@@ -28,6 +28,22 @@ export class RelationService {
     });
   }
 
+  findAdminOfMachine(machine: MachineEntity)
+  {
+    return this.relationRepository.findOne({
+      where: {
+        machine: {
+          uuid: machine.uuid,
+        },
+        type: RelationTypeEnum.Admin,
+      },
+      relations: {
+        user: true,
+        machine: true,
+      },
+    });
+  }
+
   find(user: UserEntity, machine: MachineEntity)
   {
     return this.relationRepository.findOne({
