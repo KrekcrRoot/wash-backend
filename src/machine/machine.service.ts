@@ -2,7 +2,8 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ILike, Repository } from "typeorm";
 import { MachineEntity } from "./dto/machine.entity";
 import { UserEntity } from "../user/dto/user.entity";
-import { UserTypeEnum } from "../user/dto/user.type.enum";
+import { RelationEntity } from "../relation/relation.entity";
+import { RelationTypeEnum } from "../relation/relation.type.enum";
 
 @Injectable()
 export class MachineService {
@@ -10,6 +11,7 @@ export class MachineService {
   constructor(
     @Inject('MACHINE_REPOSITORY') private machineRepository: Repository<MachineEntity>,
     @Inject('USER_REPOSITORY') private userRepository: Repository<UserEntity>,
+    @Inject('RELATION_REPOSITORY') private relationRepository: Repository<RelationEntity>
   ) {}
 
   async findAll()
@@ -49,17 +51,21 @@ export class MachineService {
 
   async getAdmin(machine: MachineEntity)
   {
-    return this.userRepository.findOne({
+
+    const relation = await this.relationRepository.findOne({
       where: {
-        link_machine: {
-          uuid: machine.uuid
+        machine: {
+          uuid: machine.uuid,
         },
-        type: UserTypeEnum.Admin,
+        type: RelationTypeEnum.Admin,
       },
       relations: {
-        link_machine: true,
+        user: true,
+        machine: true,
       },
-    });
+    })
+
+    return relation.user;
   }
 
 }

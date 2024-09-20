@@ -7,9 +7,11 @@ import { UserModule } from './user/user.module';
 import { WashModule } from './wash/wash.module';
 import { MachineModule } from './machine/machine.module';
 import { ReportModule } from './report/report.module';
+import { RelationModule } from './relation/relation.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
-  imports: [RoomModule, DatabaseModule, UserModule, WashModule, MachineModule, ReportModule],
+  imports: [RoomModule, DatabaseModule, UserModule, WashModule, MachineModule, ReportModule, RelationModule, AdminModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class KickUserDto
+export class TelegramTagUserDto
 {
   @IsString()
   @IsNotEmpty()

@@ -6,14 +6,16 @@ import { PrecreateUserDto } from "./dto/precreate.user.dto";
 import { RoomEntity } from "../room/dto/room.entity";
 import { AuthUserDto } from "./dto/auth.user.dto";
 import { UserRegisterDto } from "./dto/user.register.dto";
-import { KickUserDto } from "./dto/kick.user.dto";
+import { MachineEntity } from "../machine/dto/machine.entity";
+import { RelationService } from "../relation/relation.service";
 
 @Injectable()
 export class UserService {
 
   constructor(
     @Inject('USER_REPOSITORY') private users_repository: Repository<UserEntity>,
-    @Inject('ROOM_REPOSITORY') private room_repository: Repository<RoomEntity>
+    @Inject('ROOM_REPOSITORY') private room_repository: Repository<RoomEntity>,
+    private relationService: RelationService,
   ) {}
 
   async getAll()
@@ -33,39 +35,16 @@ export class UserService {
     });
   }
 
-  async create(dto: PrecreateUserDto)
+  async findByTelegramTag(telegram_tag: string)
   {
-    const user_exists = await this.users_repository.findOne({
+    return this.users_repository.findOne({
       where: {
-        telegram_id: dto.telegram_id,
-        telegram_tag: dto.telegram_tag,
+        telegram_tag: telegram_tag,
       },
       relations: {
-        room: true,
+        link_machine: true,
       },
     });
-
-    if(user_exists)
-      return user_exists;
-
-    const room = await this.room_repository.findOne({
-      where: {
-        path: ILike(`%${dto.room}%`),
-      },
-    });
-
-    if(!room)
-      throw new BadRequestException('There are no room with this number');
-
-    const user = this.users_repository.create({
-      ...dto,
-      room
-    });
-
-    room.available_users--;
-    await this.room_repository.save(room);
-
-    return await this.users_repository.save(user);
   }
 
   async auth(userAuthDto: AuthUserDto)
@@ -85,8 +64,18 @@ export class UserService {
     return HttpStatus.OK;
   }
 
-  async register(userRegisterDto: UserRegisterDto)
+  async register(userRegisterDto: UserRegisterDto, machine: MachineEntity)
   {
+
+    const exists = await this.users_repository.findOne({
+      where: {
+        telegram_tag: userRegisterDto.telegram_tag,
+      },
+    });
+
+    if(exists)
+      throw new BadRequestException('User already exists');
+
     const room = await this.room_repository.findOne({
       where: {
         path: ILike(`%${userRegisterDto.room}%`),
@@ -96,27 +85,14 @@ export class UserService {
     if(!room)
       throw new BadRequestException('There are no room with this path');
 
-    const user = this.users_repository.create({
+    const pre_user = this.users_repository.create({
       telegram_tag: userRegisterDto.telegram_tag,
       room: room,
     });
 
-    return this.users_repository.save(user);
-  }
+    const user = await this.users_repository.save(pre_user);
 
-  async kick(kickUserDto: KickUserDto)
-  {
-    const user = await this.users_repository.findOne({
-      where: {
-        telegram_tag: kickUserDto.telegram_tag,
-      },
-    });
-
-    if(!user)
-      throw new BadRequestException('There are no user with this tag');
-
-    user.kicked = true;
-    return this.users_repository.save(user);
+    return this.relationService.createRelation(user, machine);
   }
 
 }
