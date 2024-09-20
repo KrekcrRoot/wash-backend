@@ -18,7 +18,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UserEntity } from "./dto/user.entity";
 import { RelationService } from "../relation/relation.service";
 
-@ApiTags('User')
+@ApiTags('User controller')
 @Controller('user')
 export class UserController {
 

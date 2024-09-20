@@ -6,7 +6,7 @@ import { getUser, TokenRequest } from "../user/dto/user.validate";
 import { ReportService } from "../report/report.service";
 import { ReportEnum } from "../report/report.enum";
 
-@Controller('wash')
+@Controller('Wash controller')
 export class WashController {
 
   constructor(

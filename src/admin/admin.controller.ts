@@ -4,7 +4,9 @@ import { getUser, TokenRequest } from "../user/dto/user.validate";
 import { TelegramTagUserDto } from "../user/dto/telegram.tag.user.dto";
 import { UserService } from "../user/user.service";
 import { RelationService } from "../relation/relation.service";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Admin controller')
 @Controller('admin')
 export class AdminController {
 

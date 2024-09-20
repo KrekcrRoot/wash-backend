@@ -5,7 +5,9 @@ import { UserService } from "../user/user.service";
 import { ReportService } from "./report.service";
 import { StoreReportDto } from "./dto/store.report.dto";
 import { ReportEnum } from "./report.enum";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Report controller')
 @Controller('report')
 export class ReportController {
 

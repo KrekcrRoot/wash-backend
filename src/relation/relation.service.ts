@@ -33,6 +33,20 @@ export class RelationService {
 
   }
 
+  findAll(user: UserEntity)
+  {
+    return this.relationRepository.find({
+      where: {
+        user: {
+          uuid: user.uuid,
+        },
+      },
+      relations: {
+        machine: true,
+      },
+    })
+  }
+
   async createRelation(user: UserEntity, machine: MachineEntity)
   {
     const relation = this.relationRepository.create({ user, machine })

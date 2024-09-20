@@ -6,6 +6,7 @@ import { getUser, TokenRequest } from "../user/dto/user.validate";
 import { MachineSearchDto } from "./dto/machine.search.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UserEntity } from "../user/dto/user.entity";
+import { RelationService } from "../relation/relation.service";
 
 @ApiTags('Machine controller')
 @Controller('machine')
@@ -14,6 +15,7 @@ export class MachineController {
   constructor(
     private machineService: MachineService,
     private userService: UserService,
+    private relationService: RelationService,
   ) {}
 
   @ApiResponse({
@@ -55,7 +57,8 @@ export class MachineController {
   async getMyMachine(@Req() request: TokenRequest)
   {
     const user = await getUser(request, this.userService);
-    return user.link_machine;
+    const relations = await this.relationService.findAll(user);
+    return relations.map(relation => relation.machine);
   }
 
   @Get('/:title/admin')
