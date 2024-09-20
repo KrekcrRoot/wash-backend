@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { ILike, Repository } from "typeorm";
 import { MachineEntity } from "./dto/machine.entity";
 import { UserEntity } from "../user/dto/user.entity";
@@ -64,6 +64,9 @@ export class MachineService {
         machine: true,
       },
     })
+
+    if(!relation)
+      throw new BadRequestException('There are no admin linked to this machine');
 
     return relation.user;
   }

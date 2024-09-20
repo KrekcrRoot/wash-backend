@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { RelationEntity } from "./relation.entity";
 import { UserEntity } from "../user/dto/user.entity";
@@ -30,7 +30,16 @@ export class RelationService {
 
   find(user: UserEntity, machine: MachineEntity)
   {
-
+    return this.relationRepository.findOne({
+      where: {
+        user: {
+          uuid: user.uuid,
+        },
+        machine: {
+          uuid: machine.uuid,
+        },
+      },
+    });
   }
 
   findAll(user: UserEntity)
@@ -49,7 +58,12 @@ export class RelationService {
 
   async createRelation(user: UserEntity, machine: MachineEntity)
   {
-    const relation = this.relationRepository.create({ user, machine })
+    const exists = await this.find(user, machine);
+
+    if(exists)
+      throw new BadRequestException('There are already relation exists');
+
+    const relation = this.relationRepository.create({ user, machine });
     return this.relationRepository.save(relation);
   }
 
@@ -66,7 +80,11 @@ export class RelationService {
       },
     });
 
-    return this.relationRepository.remove(relation);
+    if(!relation)
+      throw new BadRequestException('There is no relation entity');
+
+    await this.relationRepository.remove(relation);
+    return HttpStatus.ACCEPTED;
   }
 
 }
