@@ -65,7 +65,7 @@ export class AdminController {
     const relation = await this.relationService.findAdminOfMachine(user.link_machine);
 
     return {
-      isAdmin: relation.user == user,
+      isAdmin: relation.user.uuid == user.uuid,
     }
 
   }
