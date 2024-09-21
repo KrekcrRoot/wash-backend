@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, ForbiddenException, Post, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, ForbiddenException, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../user/auth.guard";
 import { getUser, TokenRequest } from "../user/dto/user.validate";
 import { TelegramTagUserDto } from "../user/dto/telegram.tag.user.dto";
@@ -58,7 +58,7 @@ export class AdminController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/check')
+  @Get('/check')
   async check(@Req() tokenRequest: TokenRequest)
   {
     const user = await getUser(tokenRequest, this.userService);
