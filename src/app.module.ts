@@ -9,9 +9,10 @@ import { MachineModule } from './machine/machine.module';
 import { ReportModule } from './report/report.module';
 import { RelationModule } from './relation/relation.module';
 import { AdminModule } from './admin/admin.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
-  imports: [RoomModule, DatabaseModule, UserModule, WashModule, MachineModule, ReportModule, RelationModule, AdminModule],
+  imports: [RoomModule, DatabaseModule, UserModule, WashModule, MachineModule, ReportModule, RelationModule, AdminModule, OrderModule],
   controllers: [AppController],
   providers: [AppService],
 })

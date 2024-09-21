@@ -6,13 +6,15 @@ import { DatabaseModule } from "../database/database.module";
 import { MachineModule } from "../machine/machine.module";
 import { UserModule } from "../user/user.module";
 import { ReportModule } from "../report/report.module";
+import { RelationModule } from "../relation/relation.module";
 
 @Module({
   imports: [
     DatabaseModule,
     MachineModule,
     UserModule,
-    ReportModule
+    ReportModule,
+    RelationModule
   ],
   providers: [WashService, ...washProviders],
   controllers: [WashController],

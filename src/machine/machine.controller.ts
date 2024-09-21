@@ -2,9 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
-  ForbiddenException,
+  ForbiddenException, forwardRef,
   Get,
-  HttpStatus,
+  HttpStatus, Inject,
   Param,
   Post,
   Req,
@@ -28,7 +28,7 @@ export class MachineController {
     private machineService: MachineService,
     private userService: UserService,
     private relationService: RelationService,
-    private washService: WashService,
+    @Inject(forwardRef(() => WashService)) private washService: WashService,
   ) {}
 
   @ApiResponse({

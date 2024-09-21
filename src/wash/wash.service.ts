@@ -5,7 +5,6 @@ import { MachineEntity } from "../machine/dto/machine.entity";
 import { WashStatusDto } from "./dto/wash.status.dto";
 import { UserEntity } from "../user/dto/user.entity";
 import { WashTotalDto } from "./dto/wash.total.dto";
-import { ReportService } from "../report/report.service";
 
 @Injectable()
 export class WashService {
