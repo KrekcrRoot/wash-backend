@@ -57,4 +57,17 @@ export class AdminController {
     return this.relationService.removeRelation(kicked_user, relation.machine);
   }
 
+  @UseGuards(AuthGuard)
+  @Post('/check')
+  async check(@Req() tokenRequest: TokenRequest)
+  {
+    const user = await getUser(tokenRequest, this.userService);
+    const relation = await this.relationService.findAdminOfMachine(user.link_machine);
+
+    return {
+      isAdmin: relation.user == user,
+    }
+
+  }
+
 }
