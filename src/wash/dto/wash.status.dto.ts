@@ -1,8 +1,9 @@
+import { WashStatusEnum } from "../wash.status.enum";
 
 
 export class WashStatusDto {
 
-  isActive: boolean;
+  status: WashStatusEnum;
   telegramTag?: string;
   timeBegin?: Date;
 

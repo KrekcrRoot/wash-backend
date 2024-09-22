@@ -2,9 +2,11 @@ import {
   BadRequestException,
   Body,
   Controller,
-  ForbiddenException, forwardRef,
+  ForbiddenException,
+  forwardRef,
   Get,
-  HttpStatus, Inject,
+  HttpStatus,
+  Inject,
   Param,
   Post,
   Req,
@@ -19,6 +21,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UserEntity } from "../user/dto/user.entity";
 import { RelationService } from "../relation/relation.service";
 import { WashService } from "../wash/wash.service";
+import { WashStatusEnum } from "../wash/wash.status.enum";
 
 @ApiTags('Machine controller')
 @Controller('machine')
@@ -48,7 +51,10 @@ export class MachineController {
     if(user.link_machine)
     {
       const status = await this.washService.getStatus(user.link_machine);
-      if(status.isActive && status.telegramTag == user.telegram_tag)
+      if(
+        (status.status == WashStatusEnum.Busy || status.status == WashStatusEnum.Waiting)
+        && status.telegramTag == user.telegram_tag
+      )
         throw new ForbiddenException('You can\'t relink to another machine while washing');
     }
 
@@ -69,7 +75,10 @@ export class MachineController {
       throw new BadRequestException('You already not linked to any machines');
 
     const status = await this.washService.getStatus(user.link_machine);
-    if(status.isActive && status.telegramTag == user.telegram_tag)
+    if(
+      (status.status == WashStatusEnum.Busy || status.status == WashStatusEnum.Waiting)
+      && status.telegramTag == user.telegram_tag
+    )
       throw new ForbiddenException('You can\'t unlink from machine while washing');
 
     return this.machineService.unlinkMachine(user);

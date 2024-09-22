@@ -9,11 +9,21 @@ import { RelationModule } from "../relation/relation.module";
 import { relationProviders } from "../relation/relation.providers";
 import { WashService } from "../wash/wash.service";
 import { washProviders } from "../wash/wash.providers";
+import { OrderModule } from "../order/order.module";
+import { orderProviders } from "../order/order.providers";
 
 @Module({
-  imports: [DatabaseModule, UserModule, RelationModule],
+  imports: [DatabaseModule, UserModule, RelationModule, OrderModule],
   controllers: [MachineController],
-  providers: [MachineService, ...machineProviders, ...userProviders, ...relationProviders, WashService, ...washProviders],
+  providers: [
+    MachineService,
+    ...machineProviders,
+    ...userProviders,
+    ...relationProviders,
+    WashService,
+    ...washProviders,
+    ...orderProviders
+  ],
   exports: [...machineProviders],
 })
 export class MachineModule {}

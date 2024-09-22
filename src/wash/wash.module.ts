@@ -7,6 +7,7 @@ import { MachineModule } from "../machine/machine.module";
 import { UserModule } from "../user/user.module";
 import { ReportModule } from "../report/report.module";
 import { RelationModule } from "../relation/relation.module";
+import { orderProviders } from "../order/order.providers";
 
 @Module({
   imports: [
@@ -14,9 +15,9 @@ import { RelationModule } from "../relation/relation.module";
     MachineModule,
     UserModule,
     ReportModule,
-    RelationModule
+    RelationModule,
   ],
-  providers: [WashService, ...washProviders],
+  providers: [WashService, ...washProviders, ...orderProviders],
   controllers: [WashController],
   exports: [...washProviders],
 

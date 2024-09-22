@@ -1,4 +1,4 @@
-import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "../user/dto/user.entity";
 import { WashEntity } from "../wash/dto/wash.entity";
 
@@ -20,5 +20,8 @@ export class OrderEntity
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
   created_at: Date;
+
+  @Column({ default: true })
+  relevance: boolean;
 
 }

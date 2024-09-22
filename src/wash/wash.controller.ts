@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Controller, ForbiddenException, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { WashService } from "./wash.service";
 import { UserService } from "../user/user.service";
 import { AuthGuard } from "../user/auth.guard";
@@ -38,6 +38,10 @@ export class WashController {
   async occupy(@Req() tokenRequest: TokenRequest)
   {
     const user = await getUser(tokenRequest, this.userService);
+
+    if(!user.link_machine)
+      throw new ForbiddenException('You aren\'t linked to machine');
+
     return this.washService.occupy(user);
   }
 
