@@ -1,4 +1,4 @@
-import { Controller, Post, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "../user/auth.guard";
 import { OrderService } from "./order.service";
@@ -31,7 +31,7 @@ export class OrderController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/get-last')
+  @Get('/get-last')
   async getOrder(@Req() tokenRequest: TokenRequest)
   {
     const user = await getUser(tokenRequest, this.userService);
