@@ -54,6 +54,10 @@ export class WashController {
   async end(@Req() tokenRequest: TokenRequest)
   {
     const user = await getUser(tokenRequest, this.userService);
+
+    if(!user.link_machine)
+      throw new BadRequestException('You aren\'t linked to machine');
+
     return this.washService.end(user);
   }
 

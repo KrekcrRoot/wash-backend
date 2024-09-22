@@ -155,18 +155,17 @@ export class WashService {
         user: {
           uuid: user.uuid,
         },
+        time_end: null,
       },
       order: {
         id: 'desc',
       },
     });
 
-    if(wash.time_end !== null)
-    {
+    if(!wash)
       throw new BadRequestException('You don\'t have any washes');
-    }
 
-    const machine = (await this.machineRepository.find())[0];
+    const machine = user.link_machine;
     machine.isActive = false;
     await this.machineRepository.save(machine);
 
