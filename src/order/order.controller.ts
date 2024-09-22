@@ -30,4 +30,12 @@ export class OrderController {
     return this.orderService.cancel(user);
   }
 
+  @UseGuards(AuthGuard)
+  @Post('/get-last')
+  async getOrder(@Req() tokenRequest: TokenRequest)
+  {
+    const user = await getUser(tokenRequest, this.userService);
+    return this.orderService.getLastOrder(user.link_machine);
+  }
+
 }

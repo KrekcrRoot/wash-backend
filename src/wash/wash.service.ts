@@ -124,6 +124,14 @@ export class WashService {
         return status;
       }
 
+      if(relevance && order)
+      {
+        status.status = WashStatusEnum.Ordered;
+        status.telegramTag = wash.user.telegram_tag;
+        status.timeBegin = wash.time_begin;
+        return status;
+      }
+
       if(relevance)
       {
         status.status = WashStatusEnum.Busy;
