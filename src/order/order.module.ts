@@ -8,9 +8,10 @@ import { washProviders } from "../wash/wash.providers";
 import { machineProviders } from "../machine/machine.providers";
 import { userProviders } from "../user/user.provider";
 import { UserModule } from "../user/user.module";
+import { ConnectionModule } from "../connection/connection.module";
 
 @Module({
-  imports: [DatabaseModule, UserModule],
+  imports: [DatabaseModule, UserModule, ConnectionModule],
   controllers: [OrderController],
   providers: [OrderService, ...orderProviders, WashService, ...washProviders, ...machineProviders, ...userProviders],
   exports: [...orderProviders],

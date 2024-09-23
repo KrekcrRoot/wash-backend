@@ -8,6 +8,7 @@ import { UserModule } from "../user/user.module";
 import { ReportModule } from "../report/report.module";
 import { RelationModule } from "../relation/relation.module";
 import { orderProviders } from "../order/order.providers";
+import { ConnectionModule } from "../connection/connection.module";
 
 @Module({
   imports: [
@@ -16,10 +17,11 @@ import { orderProviders } from "../order/order.providers";
     UserModule,
     ReportModule,
     RelationModule,
+    ConnectionModule
   ],
   providers: [WashService, ...washProviders, ...orderProviders],
   controllers: [WashController],
-  exports: [...washProviders],
+  exports: [...washProviders, WashService],
 
 })
 export class WashModule {}

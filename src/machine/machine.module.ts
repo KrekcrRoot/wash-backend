@@ -11,9 +11,10 @@ import { WashService } from "../wash/wash.service";
 import { washProviders } from "../wash/wash.providers";
 import { OrderModule } from "../order/order.module";
 import { orderProviders } from "../order/order.providers";
+import { ConnectionModule } from "../connection/connection.module";
 
 @Module({
-  imports: [DatabaseModule, UserModule, RelationModule, OrderModule],
+  imports: [DatabaseModule, UserModule, RelationModule, OrderModule, ConnectionModule],
   controllers: [MachineController],
   providers: [
     MachineService,
