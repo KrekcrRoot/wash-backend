@@ -15,8 +15,9 @@ export class ReportService {
   async make(storeReportDto: StoreReportDto, user: UserEntity)
   {
     const report = this.report_repository.create({
-      ...storeReportDto
-    })
+      ...storeReportDto,
+      user,
+    });
 
     return this.report_repository.save(report);
   }

@@ -25,4 +25,13 @@ export class ReportController {
     return this.reportService.make(report, user);
   }
 
+  @UseGuards(AuthGuard)
+  @Post('/break')
+  async breakMachine(@Req() tokenRequest: TokenRequest, @Body() report: StoreReportDto)
+  {
+    report.type = ReportEnum.Break;
+    const user = await getUser(tokenRequest, this.userService);
+    return this.reportService.make(report, user);
+  }
+
 }

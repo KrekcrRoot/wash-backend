@@ -1,6 +1,6 @@
 
 export enum ReportEnum {
   Lost = 'Lost',
-  Broke = 'Broke',
+  Break = 'Break',
   Fix = 'Fix'
 }

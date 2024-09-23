@@ -71,7 +71,7 @@ export class WashController {
   {
     const user = await getUser(tokenRequest, this.userService);
     await this.reportService.make({
-      type: ReportEnum.Broke,
+      type: ReportEnum.Break,
       body: "Machine was broke",
     }, user);
     return this.washService.broke(user.link_machine);
