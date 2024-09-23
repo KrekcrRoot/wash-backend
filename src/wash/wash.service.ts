@@ -7,6 +7,7 @@ import { UserEntity } from "../user/dto/user.entity";
 import { WashTotalDto } from "./dto/wash.total.dto";
 import { WashStatusEnum } from "./wash.status.enum";
 import { OrderEntity } from "../order/order.entity";
+import { ConnectionService } from "../connection/connection.service";
 
 @Injectable()
 export class WashService {
@@ -16,6 +17,7 @@ export class WashService {
     @Inject('MACHINE_REPOSITORY') private machineRepository: Repository<MachineEntity>,
     @Inject('USER_REPOSITORY') private userRepository: Repository<UserEntity>,
     @Inject('ORDER_REPOSITORY') private orderRepository: Repository<OrderEntity>,
+    private readonly connectionService: ConnectionService,
   ) {}
 
   async getAll()
@@ -223,8 +225,13 @@ export class WashService {
     user.count += 1;
     await this.userRepository.save(user);
 
-    const wash: WashEntity = this.washRepository.create({ machine, user });
-    return this.washRepository.save(wash);
+    const washDto: WashEntity = this.washRepository.create({ machine, user });
+    const wash = await this.washRepository.save(washDto);
+
+    this.connectionService.notificationWash(wash).then();
+    this.connectionService.timeoutWash({ wash, user }).then();
+
+    return wash;
 
   }
 
@@ -291,6 +298,8 @@ export class WashService {
     user.time += Math.round((wash.time_end.getTime() - wash.time_begin.getTime()) / (1000 * 60));
     user.trust_factor += 1;
     await this.userRepository.save(user);
+
+    this.connectionService.orderFree(wash).then();
 
     return {
       elapsedTime: (wash.time_end.getTime() - wash.time_begin.getTime()) / (1000 * 60)

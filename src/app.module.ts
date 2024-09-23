@@ -10,9 +10,23 @@ import { ReportModule } from './report/report.module';
 import { RelationModule } from './relation/relation.module';
 import { AdminModule } from './admin/admin.module';
 import { OrderModule } from './order/order.module';
+import { ConnectionModule } from './connection/connection.module';
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
-  imports: [RoomModule, DatabaseModule, UserModule, WashModule, MachineModule, ReportModule, RelationModule, AdminModule, OrderModule],
+  imports: [
+    ConfigModule.forRoot({isGlobal: true}),
+    RoomModule,
+    DatabaseModule,
+    UserModule,
+    WashModule,
+    MachineModule,
+    ReportModule,
+    RelationModule,
+    AdminModule,
+    OrderModule,
+    ConnectionModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
