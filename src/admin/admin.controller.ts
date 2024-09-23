@@ -1,4 +1,14 @@
-import { BadRequestException, Body, Controller, ForbiddenException, Get, Post, Req, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  ForbiddenException,
+  Get, Patch,
+  Post,
+  Put,
+  Req,
+  UseGuards
+} from "@nestjs/common";
 import { AuthGuard } from "../user/auth.guard";
 import { getUser, TokenRequest } from "../user/dto/user.validate";
 import { TelegramTagUserDto } from "../user/dto/telegram.tag.user.dto";
@@ -56,6 +66,7 @@ export class AdminController {
 
     return this.relationService.removeRelation(kicked_user, relation.machine);
   }
+
 
   @UseGuards(AuthGuard)
   @Get('/check')

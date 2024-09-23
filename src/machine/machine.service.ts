@@ -4,6 +4,7 @@ import { MachineEntity } from "./dto/machine.entity";
 import { UserEntity } from "../user/dto/user.entity";
 import { RelationEntity } from "../relation/relation.entity";
 import { RelationTypeEnum } from "../relation/relation.type.enum";
+import { RenameMachineDto } from "./dto/rename.machine.dto";
 
 @Injectable()
 export class MachineService {
@@ -69,6 +70,18 @@ export class MachineService {
       throw new BadRequestException('There are no admin linked to this machine');
 
     return relation.user;
+  }
+
+  async rename(renameMachineDto: RenameMachineDto)
+  {
+    const machine = await this.machineRepository.findOne({
+      where: {
+        uuid: renameMachineDto.uuid,
+      },
+    });
+
+    machine.title = renameMachineDto.title;
+    return this.machineRepository.save(machine);
   }
 
 }

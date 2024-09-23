@@ -7,7 +7,7 @@ import {
   Get,
   HttpStatus,
   Inject,
-  Param,
+  Param, Patch,
   Post,
   Req,
   UseGuards
@@ -22,7 +22,9 @@ import { UserEntity } from "../user/dto/user.entity";
 import { RelationService } from "../relation/relation.service";
 import { WashService } from "../wash/wash.service";
 import { WashStatusEnum } from "../wash/wash.status.enum";
+import { RenameMachineDto } from "./dto/rename.machine.dto";
 
+// @ts-ignore
 @ApiTags('Machine controller')
 @Controller('machine')
 export class MachineController {
@@ -108,6 +110,18 @@ export class MachineController {
       throw new BadRequestException('There are no machine with this title');
 
     return this.machineService.getAdmin(machine);
+  }
+
+  @Patch('/rename')
+  async renameMachine(@Req() tokenRequest: TokenRequest, @Body() renameMachineDto: RenameMachineDto)
+  {
+    const user = await getUser(tokenRequest, this.userService);
+    const relation = await this.relationService.findAdminOfMachine(user.link_machine);
+
+    if(relation.user.uuid != user.uuid)
+      throw new ForbiddenException('You aren\'t admin');
+
+    return this.machineService.rename(renameMachineDto);
   }
 
 }
