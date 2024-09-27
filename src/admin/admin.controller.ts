@@ -15,6 +15,7 @@ import { TelegramTagUserDto } from "../user/dto/telegram.tag.user.dto";
 import { UserService } from "../user/user.service";
 import { RelationService } from "../relation/relation.service";
 import { ApiTags } from "@nestjs/swagger";
+import { UserRegisterDto } from "../user/dto/user.register.dto";
 
 @ApiTags('Admin controller')
 @Controller('admin')
@@ -27,7 +28,7 @@ export class AdminController {
 
   @UseGuards(AuthGuard)
   @Post('/join')
-  async join(@Req() tokenRequest: TokenRequest, @Body() joinUserDto: TelegramTagUserDto)
+  async join(@Req() tokenRequest: TokenRequest, @Body() joinUserDto: UserRegisterDto)
   {
     const user = await getUser(tokenRequest, this.userService);
     const relation = await this.relationService.findAdmin(user);
@@ -38,7 +39,14 @@ export class AdminController {
     const join_user = await this.userService.findByTelegramTag(joinUserDto.telegram_tag);
 
     if(!join_user)
-      throw new BadRequestException('There are no user with this tag');
+    {
+      const newUser = await this.userService.register({
+        telegram_tag: joinUserDto.telegram_tag,
+        room: joinUserDto.room,
+      }, relation.machine);
+
+      return this.relationService.createRelation(newUser.user, relation.machine);
+    }
 
     if(join_user.telegram_id == user.telegram_id)
       throw new BadRequestException('You can\' join yourself');

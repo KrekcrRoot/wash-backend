@@ -70,10 +70,15 @@ export class WashController {
   async broke(@Req() tokenRequest: TokenRequest)
   {
     const user = await getUser(tokenRequest, this.userService);
+
+    if(!user.link_machine)
+      throw new ForbiddenException('You are not linked to machine');
+
     await this.reportService.make({
       type: ReportEnum.Break,
       body: "Machine was broke",
     }, user);
+
     return this.washService.broke(user.link_machine);
   }
 

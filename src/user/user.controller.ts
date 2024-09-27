@@ -39,18 +39,18 @@ export class UserController {
     return this.userService.getAll();
   }
 
-  @UseGuards(AuthGuard)
-  @Post('/reg')
-  async registration(@Req() tokenRequest: TokenRequest, @Body() registerUser: UserRegisterDto)
-  {
-    const user = await getUser(tokenRequest, this.userService);
-    const relation = await this.relationService.findAdmin(user);
-
-    if(!relation)
-      throw new ForbiddenException();
-
-    return this.userService.register(registerUser, relation.machine);
-  }
+  // @UseGuards(AuthGuard)
+  // @Post('/reg')
+  // async registration(@Req() tokenRequest: TokenRequest, @Body() registerUser: UserRegisterDto)
+  // {
+  //   const user = await getUser(tokenRequest, this.userService);
+  //   const relation = await this.relationService.findAdmin(user);
+  //
+  //   if(!relation)
+  //     throw new ForbiddenException();
+  //
+  //   return this.userService.register(registerUser, relation.machine);
+  // }
 
   @HttpCode(HttpStatus.OK)
   @Post('/auth')
