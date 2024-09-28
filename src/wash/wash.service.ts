@@ -232,15 +232,16 @@ export class WashService {
     this.connectionService.timeoutWash({ wash, user }).then();
 
     if(status.status == WashStatusEnum.Waiting)
-      await this.checkOrderRelevance(await this.orderRepository.findOne({
+    {
+      const order = await this.orderRepository.findOne({
         where: {
           relevance: true,
           user: {
-            telegram_id: user.telegram_id,
+            uuid: user.uuid,
           },
           wash: {
             machine: {
-              uuid: user.link_machine.uuid,
+              uuid: machine.uuid,
             },
           },
         },
@@ -248,7 +249,15 @@ export class WashService {
           user: true,
           wash: true,
         },
-      }));
+      });
+
+      if(!order)
+        return wash;
+
+      order.relevance = false;
+
+      await this.orderRepository.save(order);
+    }
 
     return wash;
 
