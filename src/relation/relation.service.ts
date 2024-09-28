@@ -105,7 +105,7 @@ export class RelationService {
 
   async findLinkedUsers(machine: MachineEntity)
   {
-    return this.relationRepository.find({
+    const washes = await this.relationRepository.find({
       where: {
         machine: {
           uuid: machine.uuid,
@@ -116,7 +116,9 @@ export class RelationService {
         machine: true,
         user: true,
       }
-    })
+    });
+
+    return washes.map(item => item.user);
   }
 
 }
