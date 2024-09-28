@@ -101,6 +101,25 @@ export class MachineController {
     return relations.map(relation => relation.machine);
   }
 
+  @UseGuards(AuthGuard)
+  @Get('/linked-users')
+  async getLinkedUsers(@Req() request: TokenRequest)
+  {
+    const user = await getUser(request, this.userService);
+
+    if(!user.link_machine)
+      throw new ForbiddenException('You are not linked to any machine');
+
+    const admin = await this.relationService.findAdminOfMachine(user.link_machine);
+    if(!admin)
+      throw new ForbiddenException('You are not admin of any machine');
+
+    if(user.uuid != admin.user.uuid)
+      throw new ForbiddenException('You are not admin of this machine');
+
+    return await this.relationService.findLinkedUsers(admin.machine);
+  }
+
   @Get('/:title/admin')
   async getAdmin(@Param() params: {title: string})
   {

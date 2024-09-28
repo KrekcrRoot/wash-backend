@@ -268,7 +268,7 @@ export class WashService {
     const machine = user.link_machine;
     const status = await this.getStatus(machine);
 
-    if(status.status == WashStatusEnum.Free || status.status == WashStatusEnum.Waiting)
+    if(status.status == WashStatusEnum.Free)
     {
       throw new ForbiddenException('You can\'t occupy order');
     }

@@ -103,5 +103,21 @@ export class RelationService {
     return HttpStatus.ACCEPTED;
   }
 
+  async findLinkedUsers(machine: MachineEntity)
+  {
+    return this.relationRepository.find({
+      where: {
+        machine: {
+          uuid: machine.uuid,
+        },
+        type: RelationTypeEnum.Default,
+      },
+      relations: {
+        machine: true,
+        user: true,
+      }
+    })
+  }
+
 }
 
