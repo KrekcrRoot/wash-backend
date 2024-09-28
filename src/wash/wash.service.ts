@@ -213,7 +213,7 @@ export class WashService {
   {
     const status = await this.getStatus(user.link_machine);
 
-    if(status.status == WashStatusEnum.Busy || status.status == WashStatusEnum.Waiting)
+    if(status.status == WashStatusEnum.Busy || status.status == WashStatusEnum.Waiting && user.telegram_tag != status.telegramTag)
     {
       throw new BadRequestException('already occupy');
     }
@@ -230,6 +230,25 @@ export class WashService {
 
     this.connectionService.notificationWash(wash).then();
     this.connectionService.timeoutWash({ wash, user }).then();
+
+    if(status.status == WashStatusEnum.Waiting)
+      await this.checkOrderRelevance(await this.orderRepository.findOne({
+        where: {
+          relevance: true,
+          user: {
+            telegram_id: user.telegram_id,
+          },
+          wash: {
+            machine: {
+              uuid: user.link_machine.uuid,
+            },
+          },
+        },
+        relations: {
+          user: true,
+          wash: true,
+        },
+      }));
 
     return wash;
 
