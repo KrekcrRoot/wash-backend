@@ -8,6 +8,7 @@ import { WashTotalDto } from "./dto/wash.total.dto";
 import { WashStatusEnum } from "./wash.status.enum";
 import { OrderEntity } from "../order/order.entity";
 import { ConnectionService } from "../connection/connection.service";
+import { RelationService } from "../relation/relation.service";
 
 @Injectable()
 export class WashService {
@@ -18,6 +19,7 @@ export class WashService {
     @Inject('USER_REPOSITORY') private userRepository: Repository<UserEntity>,
     @Inject('ORDER_REPOSITORY') private orderRepository: Repository<OrderEntity>,
     private readonly connectionService: ConnectionService,
+    private readonly relationService: RelationService,
   ) {}
 
   async getAll()
@@ -301,6 +303,37 @@ export class WashService {
 
     if(status.status == WashStatusEnum.Free)
       throw new BadRequestException('already ended');
+
+    if((await this.relationService.findAdminOfMachine(user.link_machine)).user.uuid == user.uuid)
+    {
+      const machine = user.link_machine;
+      machine.isActive = false;
+      await this.machineRepository.save(machine);
+
+      const wash: WashEntity = await this.washRepository.findOne({
+        where: {
+          machine: {
+            uuid: machine.uuid,
+          },
+          time_end: null,
+        },
+        order: {
+          id: 'desc',
+        },
+      })
+
+      wash.time_end = new Date();
+      await this.washRepository.save(wash);
+      wash.user.time += Math.round((wash.time_end.getTime() - wash.time_begin.getTime()) / (1000 * 60));
+
+      await this.userRepository.save(wash.user);
+
+      this.connectionService.orderFree(wash).then();
+
+      return {
+        elapsedTime: (wash.time_end.getTime() - wash.time_begin.getTime()) / (1000 * 60)
+      } as WashTotalDto;
+    }
 
     const wash: WashEntity = await this.washRepository.findOne({
       where: {

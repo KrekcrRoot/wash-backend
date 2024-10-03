@@ -3,7 +3,7 @@ import {
   Body,
   Controller,
   ForbiddenException,
-  Get, Patch,
+  Get, Inject, Patch,
   Post,
   Put,
   Req,
@@ -16,6 +16,9 @@ import { UserService } from "../user/user.service";
 import { RelationService } from "../relation/relation.service";
 import { ApiTags } from "@nestjs/swagger";
 import { UserRegisterDto } from "../user/dto/user.register.dto";
+import { TransferRightsDto } from "./dto/transferRights.dto";
+import { Repository } from "typeorm";
+import { RelationEntity } from "../relation/relation.entity";
 
 @ApiTags('Admin controller')
 @Controller('admin')
@@ -24,6 +27,7 @@ export class AdminController {
   constructor(
     private readonly userService: UserService,
     private readonly relationService: RelationService,
+    @Inject('RELATION_REPOSITORY') private readonly relationRepository: Repository<RelationEntity>,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -86,7 +90,26 @@ export class AdminController {
     return {
       isAdmin: relation.user.uuid == user.uuid,
     }
+  }
 
+  @UseGuards(AuthGuard)
+  @Post('/transfer-rights')
+  async transferRights(@Req() tokenRequest: TokenRequest, @Body() transferRightsDto: TransferRightsDto)
+  {
+    const user = await getUser(tokenRequest, this.userService);
+    const relation = await this.relationService.findAdminOfMachine(user.link_machine);
+
+    if(relation.user.uuid != user.uuid)
+      throw new ForbiddenException('You are not admin of this machine');
+
+    const admin = await this.userService.findByTelegramTag(transferRightsDto.telegram_tag);
+
+    if(!admin)
+      throw new BadRequestException('There are no user with this tag');
+
+    relation.user = admin;
+
+    return this.relationRepository.save(relation);
   }
 
 }

@@ -38,4 +38,11 @@ export class OrderController {
     return this.orderService.getLastOrder(user.link_machine);
   }
 
+  @Get('/history')
+  async getOrderHistory(@Req() tokenRequest: TokenRequest)
+  {
+    const user = await getUser(tokenRequest, this.userService);
+    return this.orderService.getHistory(user.link_machine);
+  }
+
 }

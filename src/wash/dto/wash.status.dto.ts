@@ -6,5 +6,6 @@ export class WashStatusDto {
   status: WashStatusEnum;
   telegramTag?: string;
   timeBegin?: Date;
+  reportBody?: string;
 
 }

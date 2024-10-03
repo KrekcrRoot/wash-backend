@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "../user/dto/user.entity";
 import { WashEntity } from "../wash/dto/wash.entity";
 
@@ -14,6 +14,9 @@ export class OrderEntity
 
   @ManyToOne(() => WashEntity, wash => wash.id)
   wash: WashEntity;
+
+  @OneToOne(() => OrderEntity, order => order.uuid, {nullable: true})
+  queue: OrderEntity;
 
   @CreateDateColumn({
     type: 'timestamp',

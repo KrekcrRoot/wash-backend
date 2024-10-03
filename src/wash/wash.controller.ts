@@ -65,42 +65,42 @@ export class WashController {
     return this.washService.end(user);
   }
 
-  @UseGuards(AuthGuard)
-  @Post('/broke')
-  async broke(@Req() tokenRequest: TokenRequest)
-  {
-    const user = await getUser(tokenRequest, this.userService);
-
-    if(!user.link_machine)
-      throw new ForbiddenException('You are not linked to machine');
-
-    await this.reportService.make({
-      type: ReportEnum.Break,
-      body: "Machine was broke",
-    }, user);
-
-    return this.washService.broke(user.link_machine);
-  }
-
-  @UseGuards(AuthGuard)
-  @Post('/fix')
-  async fix(@Req() tokenRequest: TokenRequest)
-  {
-    const user = await getUser(tokenRequest, this.userService);
-
-    if(!user.link_machine)
-      throw new BadRequestException('You are not linked to machine');
-
-    const relation = await this.relationService.findAdminOfMachine(user.link_machine);
-    if(relation.user.uuid != user.uuid)
-      throw new BadRequestException('You are not admin of this machine')
-
-    await this.reportService.make({
-      type: ReportEnum.Fix,
-      body: "Machine fixed",
-    }, user);
-
-    return this.washService.fix(user.link_machine)
-  }
+  // @UseGuards(AuthGuard)
+  // @Post('/broke')
+  // async broke(@Req() tokenRequest: TokenRequest)
+  // {
+  //   const user = await getUser(tokenRequest, this.userService);
+  //
+  //   if(!user.link_machine)
+  //     throw new ForbiddenException('You are not linked to machine');
+  //
+  //   await this.reportService.make({
+  //     type: ReportEnum.Break,
+  //     body: "Machine was broke",
+  //   }, user);
+  //
+  //   return this.washService.broke(user.link_machine);
+  // }
+  //
+  // @UseGuards(AuthGuard)
+  // @Post('/fix')
+  // async fix(@Req() tokenRequest: TokenRequest)
+  // {
+  //   const user = await getUser(tokenRequest, this.userService);
+  //
+  //   if(!user.link_machine)
+  //     throw new BadRequestException('You are not linked to machine');
+  //
+  //   const relation = await this.relationService.findAdminOfMachine(user.link_machine);
+  //   if(relation.user.uuid != user.uuid)
+  //     throw new BadRequestException('You are not admin of this machine')
+  //
+  //   await this.reportService.make({
+  //     type: ReportEnum.Fix,
+  //     body: "Machine fixed",
+  //   }, user);
+  //
+  //   return this.washService.fix(user.link_machine)
+  // }
 
 }

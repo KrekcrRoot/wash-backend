@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { ReportEntity } from "../../report/report.entity";
 
 @Entity('Machines')
 export class MachineEntity {
@@ -14,5 +15,12 @@ export class MachineEntity {
 
   @Column({ default: false })
   broken: boolean;
+
+  @OneToOne(
+    () => ReportEntity,
+    report => report.uuid,
+    {nullable: true}
+  )
+  broken_report: ReportEntity;
 
 }

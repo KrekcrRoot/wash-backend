@@ -5,4 +5,5 @@ export enum WashStatusEnum
   Busy = 'Busy',
   Waiting = 'Waiting',
   Ordered = 'Ordered',
+  Broken = 'Broken',
 }

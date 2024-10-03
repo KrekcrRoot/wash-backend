@@ -77,4 +77,16 @@ export class OrderService {
     });
   }
 
+  async getHistory(machine: MachineEntity)
+  {
+    return this.orderRepository.find({
+      where: {
+
+      },
+      relations: {
+        queue: true,
+      },
+    })
+  }
+
 }
