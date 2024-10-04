@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ReportEntity } from "../../report/report.entity";
 
 @Entity('Machines')
@@ -21,6 +21,7 @@ export class MachineEntity {
     report => report.uuid,
     {nullable: true}
   )
+  @JoinColumn()
   broken_report: ReportEntity;
 
 }
