@@ -69,7 +69,19 @@ export class WashService {
       where: {
         uuid: machineDto.uuid
       },
+      relations: {
+        broken_report: true,
+      },
     });
+
+    if(machine.broken)
+    {
+      return {
+        status: WashStatusEnum.Broken,
+        reportBody: machine.broken_report.body,
+      } as WashStatusDto;
+    }
+
 
     const status: WashStatusDto = {
       status: WashStatusEnum.Free,
