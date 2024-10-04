@@ -3,9 +3,9 @@ import {
   Body,
   Controller,
   ForbiddenException,
-  Get, Inject, Patch,
+  Get,
+  Inject,
   Post,
-  Put,
   Req,
   UseGuards
 } from "@nestjs/common";
@@ -19,6 +19,7 @@ import { UserRegisterDto } from "../user/dto/user.register.dto";
 import { TransferRightsDto } from "./dto/transferRights.dto";
 import { Repository } from "typeorm";
 import { RelationEntity } from "../relation/relation.entity";
+import { RelationTypeEnum } from "../relation/relation.type.enum";
 
 @ApiTags('Admin controller')
 @Controller('admin')
@@ -107,8 +108,11 @@ export class AdminController {
     if(!admin)
       throw new BadRequestException('There are no user with this tag');
 
+    const previous_relation = await this.relationService.find(user, user.link_machine);
+    previous_relation.type = RelationTypeEnum.Default;
     relation.user = admin;
 
+    await this.relationRepository.save(previous_relation);
     return this.relationRepository.save(relation);
   }
 
