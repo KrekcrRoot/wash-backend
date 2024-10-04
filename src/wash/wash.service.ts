@@ -320,6 +320,9 @@ export class WashService {
         order: {
           id: 'desc',
         },
+        relations: {
+          user: true,
+        },
       })
 
       wash.time_end = new Date();

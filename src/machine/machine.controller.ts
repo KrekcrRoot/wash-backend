@@ -23,6 +23,7 @@ import { RelationService } from "../relation/relation.service";
 import { WashService } from "../wash/wash.service";
 import { WashStatusEnum } from "../wash/wash.status.enum";
 import { RenameMachineDto } from "./dto/rename.machine.dto";
+import { TitleMachineDto } from "./dto/title.machine.dto";
 
 // @ts-ignore
 @ApiTags('Machine controller')
@@ -132,15 +133,22 @@ export class MachineController {
   }
 
   @Patch('/rename')
-  async renameMachine(@Req() tokenRequest: TokenRequest, @Body() renameMachineDto: RenameMachineDto)
+  async renameMachine(@Req() tokenRequest: TokenRequest, @Body() renameMachineDto: TitleMachineDto)
   {
     const user = await getUser(tokenRequest, this.userService);
+
+    if(!user.link_machine)
+      throw new BadRequestException('You are not linked to any machine');
+
     const relation = await this.relationService.findAdminOfMachine(user.link_machine);
 
     if(relation.user.uuid != user.uuid)
       throw new ForbiddenException('You aren\'t admin');
 
-    return this.machineService.rename(renameMachineDto);
+    return this.machineService.rename({
+      uuid: relation.machine.uuid,
+      title: renameMachineDto.title,
+    });
   }
 
 }
