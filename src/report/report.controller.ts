@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Inject, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, ForbiddenException, forwardRef, Inject, Post, Req, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../user/auth.guard";
 import { getUser, TokenRequest } from "../user/dto/user.validate";
 import { UserService } from "../user/user.service";
@@ -20,7 +20,7 @@ export class ReportController {
     private readonly reportService: ReportService,
     @Inject('MACHINE_REPOSITORY') private readonly machineRepository: Repository<MachineEntity>,
     private readonly relationService: RelationService,
-    private readonly washService: WashService,
+    @Inject(forwardRef(() => WashService)) private washService: WashService,
   ) {}
 
   @UseGuards(AuthGuard)
