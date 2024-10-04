@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { WashEntity } from "./dto/wash.entity";
 import { MachineEntity } from "../machine/dto/machine.entity";
@@ -9,6 +9,7 @@ import { WashStatusEnum } from "./wash.status.enum";
 import { OrderEntity } from "../order/order.entity";
 import { ConnectionService } from "../connection/connection.service";
 import { RelationService } from "../relation/relation.service";
+import { HttpService } from "@nestjs/axios";
 
 @Injectable()
 export class WashService {
@@ -307,6 +308,24 @@ export class WashService {
     });
 
     return await this.orderRepository.save(order);
+  }
+
+  async hardEnd(machine: MachineEntity)
+  {
+    const wash = await this.getLatestOfMachine(machine);
+
+    if(!wash)
+      throw new BadRequestException('There are no washing right now');
+
+    wash.hard_end = true;
+    wash.time_end = new Date();
+    wash.user.time += Math.round((wash.time_end.getTime() - wash.time_begin.getTime()) / (1000 * 60));
+
+    await this.washRepository.save(wash);
+    await this.userRepository.save(wash.user);
+
+    return HttpStatus.OK;
+
   }
 
   async end(user: UserEntity)

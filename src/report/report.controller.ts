@@ -9,6 +9,7 @@ import { ApiTags } from "@nestjs/swagger";
 import { Repository } from "typeorm";
 import { MachineEntity } from "../machine/dto/machine.entity";
 import { RelationService } from "../relation/relation.service";
+import { WashService } from "../wash/wash.service";
 
 @ApiTags('Report controller')
 @Controller('report')
@@ -19,6 +20,7 @@ export class ReportController {
     private readonly reportService: ReportService,
     @Inject('MACHINE_REPOSITORY') private readonly machineRepository: Repository<MachineEntity>,
     private readonly relationService: RelationService,
+    private readonly washService: WashService,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -43,7 +45,9 @@ export class ReportController {
       },
     });
 
+    await this.washService.hardEnd(machine);
     machine.broken = true;
+    machine.isActive = false;
 
     const response = await this.reportService.make(report, user);
     machine.broken_report = response;
