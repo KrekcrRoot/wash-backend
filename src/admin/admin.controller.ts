@@ -98,22 +98,33 @@ export class AdminController {
   async transferRights(@Req() tokenRequest: TokenRequest, @Body() transferRightsDto: TransferRightsDto)
   {
     const user = await getUser(tokenRequest, this.userService);
+
+    if(!user.link_machine)
+      throw new BadRequestException('You are not linked to machine');
+
     const relation = await this.relationService.findAdminOfMachine(user.link_machine);
 
     if(relation.user.uuid != user.uuid)
-      throw new ForbiddenException('You are not admin of this machine');
+      throw new ForbiddenException('You aren\'t admin of this machine');
 
     const admin = await this.userService.findByTelegramTag(transferRightsDto.telegram_tag);
 
     if(!admin)
       throw new BadRequestException('There are no user with this tag');
 
-    const previous_relation = await this.relationService.find(user, user.link_machine);
-    previous_relation.type = RelationTypeEnum.Default;
-    relation.user = admin;
+    if(admin.uuid == user.uuid)
+      throw new BadRequestException('You already admin of this machine');
 
-    await this.relationRepository.save(previous_relation);
-    return this.relationRepository.save(relation);
+    const admin_relation = await this.relationService.find(admin, relation.machine);
+
+    if(!admin_relation)
+      throw new BadRequestException('This user are not member of this machine');
+
+    relation.type = RelationTypeEnum.Default;
+    admin_relation.type = RelationTypeEnum.Admin;
+
+    await this.relationRepository.save(relation);
+    return await this.relationRepository.save(admin_relation);
   }
 
 }
