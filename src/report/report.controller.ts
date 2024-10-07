@@ -10,6 +10,7 @@ import { Repository } from "typeorm";
 import { MachineEntity } from "../machine/dto/machine.entity";
 import { RelationService } from "../relation/relation.service";
 import { WashService } from "../wash/wash.service";
+import { ConnectionService } from "../connection/connection.service";
 
 @ApiTags('Report controller')
 @Controller('report')
@@ -21,6 +22,7 @@ export class ReportController {
     @Inject('MACHINE_REPOSITORY') private readonly machineRepository: Repository<MachineEntity>,
     private readonly relationService: RelationService,
     @Inject(forwardRef(() => WashService)) private washService: WashService,
+    private connectionService: ConnectionService
   ) {}
 
   @UseGuards(AuthGuard)
@@ -53,6 +55,8 @@ export class ReportController {
     machine.broken_report = response;
 
     await this.machineRepository.save(machine);
+    const res = await this.connectionService.machineBreak(response, machine, user);
+
     return response;
   }
 

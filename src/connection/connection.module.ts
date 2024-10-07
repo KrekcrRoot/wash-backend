@@ -6,7 +6,10 @@ import { orderProviders } from "../order/order.providers";
 import { DatabaseModule } from "../database/database.module";
 
 @Module({
-  imports: [HttpModule, DatabaseModule],
+  imports: [HttpModule.register({
+    timeout: 5000,
+    maxRedirects: 5,
+  }), DatabaseModule],
   providers: [ConnectionService, ...washProviders, ...orderProviders],
   exports: [ConnectionService],
 })

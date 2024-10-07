@@ -5,6 +5,9 @@ import { ConfigService } from "@nestjs/config";
 import { Repository } from "typeorm";
 import { WashEntity } from "../wash/dto/wash.entity";
 import { OrderEntity } from "../order/order.entity";
+import { ReportEntity } from "../report/report.entity";
+import { MachineEntity } from "../machine/dto/machine.entity";
+import { UserEntity } from "../user/dto/user.entity";
 
 const delay = (t) => new Promise(resolve => setTimeout(resolve, t));
 
@@ -23,6 +26,15 @@ export class ConnectionService {
   }
 
   private readonly host: string;
+
+  async machineBreak(report: ReportEntity, machine: MachineEntity, user: UserEntity)
+  {
+    return this.httpService.post(`${this.host}/machine/break`, {
+      machine_uuid: machine.uuid,
+      body: report.body,
+      user_uuid: user.uuid,
+    });
+  }
 
   async timeoutWash(timeoutWashDto: TimeoutWashDto)
   {
